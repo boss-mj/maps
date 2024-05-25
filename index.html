@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Geolocation with Street View</title>
+    <!-- <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCrr9NKmy3uUtYq0yZirRedILEuMMtHVCE"></script> -->
+    <script async
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCrr9NKmy3uUtYq0yZirRedILEuMMtHVCE&loading=async&callback=initMap">
+</script>
+    <style>
+        #map {
+            height: 100%;
+            width: 100%;
+        }
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        #buttonContainer {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1;
+        }
+    </style>
+</head>
+<body>
+    <div id="buttonContainer">
+        <button onclick="getLocation()">Show My Street View</button>
+    </div>
+    <div id="map"></div>
+
+    <script>
+        var map;
+        var panorama;
+
+        function getLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(showPosition, showError, {
+                    enableHighAccuracy: true,
+                    timeout: 5000,
+                    maximumAge: 0
+                });
+            } else {
+                alert("Geolocation is not supported by this browser.");
+            }
+            
+        function initMap() {
+            // Initialize the map centered at a default location
+            map = new google.maps.Map(document.getElementById('map'), {
+                center: {lat: -34.397, lng: 150.644},
+                zoom: 86
+            });
+
+            // Initialize the panorama
+            panorama = new google.maps.StreetViewPanorama(
+                document.getElementById('map'), {
+                    position: {lat: -34.397, lng: 150.644},
+                    pov: {heading: 165, pitch: 0},
+                    zoom: 1
+                });
+        }
+        initMap() ;
+
+        }
+
+        function showPosition(position) {
+            var lat = position.coords.latitude;
+            var lng = position.coords.longitude;
+            var location = new google.maps.LatLng(lat, lng);
+
+            // Update the map center
+            map.setCenter(location);
+            map.setZoom(16);
+
+            // Set the position of the Street View
+            panorama.setPosition(location);
+            panorama.setPov({heading: 165, pitch: 0});
+            map.setStreetView(panorama);
+        }
+
+        function showError(error) {
+            switch(error.code) {
+                case error.PERMISSION_DENIED:
+                    alert("User denied the request for Geolocation.");
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    alert("Location information is unavailable.");
+                    break;
+                case error.TIMEOUT:
+                    alert("The request to get user location timed out.");
+                    break;
+                case error.UNKNOWN_ERROR:
+                    alert("An unknown error occurred.");
+                    break;
+            }
+        }
+        // Load the map
+    </script>
+</body>
+</html>
